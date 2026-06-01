@@ -18,7 +18,6 @@ func NewFirefighterHandler(repo repository.FirefighterRepository) *FirefighterHa
     return &FirefighterHandler{repo: repo}
 }
 
-// Create – POST /api/firefighters
 func (h *FirefighterHandler) Create(w http.ResponseWriter, r *http.Request) {
     var input models.Firefighter
     if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -38,7 +37,6 @@ func (h *FirefighterHandler) Create(w http.ResponseWriter, r *http.Request) {
     respondJSON(w, http.StatusCreated, input)
 }
 
-// GetByID – GET /api/firefighters/{id}
 func (h *FirefighterHandler) GetByID(w http.ResponseWriter, r *http.Request) {
     idStr := chi.URLParam(r, "id")
     id, err := strconv.Atoi(idStr)
@@ -54,7 +52,6 @@ func (h *FirefighterHandler) GetByID(w http.ResponseWriter, r *http.Request) {
     respondJSON(w, http.StatusOK, ff)
 }
 
-// GetAll – GET /api/firefighters?team=...
 func (h *FirefighterHandler) GetAll(w http.ResponseWriter, r *http.Request) {
     teamStr := r.URL.Query().Get("team")
     if teamStr != "" {
@@ -79,7 +76,6 @@ func (h *FirefighterHandler) GetAll(w http.ResponseWriter, r *http.Request) {
     respondJSON(w, http.StatusOK, list)
 }
 
-// Update – PUT /api/firefighters/{id}
 func (h *FirefighterHandler) Update(w http.ResponseWriter, r *http.Request) {
     idStr := chi.URLParam(r, "id")
     id, err := strconv.Atoi(idStr)
@@ -100,7 +96,6 @@ func (h *FirefighterHandler) Update(w http.ResponseWriter, r *http.Request) {
     respondJSON(w, http.StatusOK, input)
 }
 
-// Delete – DELETE /api/firefighters/{id}
 func (h *FirefighterHandler) Delete(w http.ResponseWriter, r *http.Request) {
     idStr := chi.URLParam(r, "id")
     id, err := strconv.Atoi(idStr)

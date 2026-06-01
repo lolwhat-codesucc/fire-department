@@ -48,7 +48,6 @@ func (h *CallHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	districtStr := r.URL.Query().Get("district")
 	statusStr := r.URL.Query().Get("status")
 
-	// Проверяем, что передан только один фильтр (для простоты)
 	filtersCount := 0
 	if teamStr != "" { filtersCount++ }
 	if carStr != "" { filtersCount++ }

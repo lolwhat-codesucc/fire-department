@@ -39,7 +39,6 @@ func (h *TeamHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TeamHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	// Фильтрация по району и специализации
 	districtStr := r.URL.Query().Get("district")
 	specStr := r.URL.Query().Get("specialization")
 

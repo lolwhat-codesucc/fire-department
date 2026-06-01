@@ -40,7 +40,7 @@ func TestCreateFirefighter_Success(t *testing.T) {
 	repo.On("Create", mock.Anything, &input).Return(1, nil)
 
 	r := setupFirefighterRouter(repo)
-	body, _ := json.Marshal(map[string]interface{}{
+	body, _ := json.Marshal(map[string]any{
 		"name":          input.Name,
 		"year_of_birth": "1990-01-01",
 		"rank_id":       input.RankID,
@@ -85,7 +85,7 @@ func TestGetFirefighterByID_NotFound(t *testing.T) {
 
 func TestGetAllFirefighters_WithTeamFilter(t *testing.T) {
 	repo := new(mocks.FirefighterRepository)
-	expected := []models.Firefighter{{ID: 1, Name: "Петров", TeamID: intPtr(5)}}
+	expected := []models.Firefighter{{ID: 1, Name: "Петров", TeamID: new(5)}}
 	repo.On("GetByTeam", mock.Anything, 5).Return(expected, nil)
 
 	r := setupFirefighterRouter(repo)
@@ -113,7 +113,7 @@ func TestUpdateFirefighter_Success(t *testing.T) {
 	repo.On("Update", mock.Anything, &updated).Return(nil)
 
 	r := setupFirefighterRouter(repo)
-	body, _ := json.Marshal(map[string]interface{}{
+	body, _ := json.Marshal(map[string]any{
 		"name":          updated.Name,
 		"year_of_birth": "1990-01-01",
 		"rank_id":       updated.RankID,

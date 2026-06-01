@@ -40,7 +40,7 @@ func TestCreateCall_Success(t *testing.T) {
 	repo.On("Create", mock.Anything, &input).Return(7, nil)
 
 	r := setupCallRouter(repo)
-	body, _ := json.Marshal(map[string]interface{}{
+	body, _ := json.Marshal(map[string]any{
 		"team_id":   input.TeamID,
 		"car_id":    input.CarID,
 		"time":      input.Time.Format(time.RFC3339),
@@ -60,7 +60,7 @@ func TestCreateCall_Success(t *testing.T) {
 func TestCreateCall_MissingFields(t *testing.T) {
 	repo := new(mocks.CallRepository)
 	r := setupCallRouter(repo)
-	body := `{"team_id":1}` // отсутствуют car_id, time, status_id
+	body := `{"team_id":1}` 
 	req := httptest.NewRequest(http.MethodPost, "/api/calls", bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()

@@ -7,12 +7,10 @@ import (
 	"time"
 )
 
-// Date – дата без времени (формат JSON: "2006-01-02", БД: DATE).
 type Date struct {
 	time.Time
 }
 
-// UnmarshalJSON реализует парсинг из строки "YYYY-MM-DD".
 func (d *Date) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
 	if s == "null" || s == "" {
@@ -27,7 +25,6 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// MarshalJSON сериализует дату в строку "YYYY-MM-DD".
 func (d Date) MarshalJSON() ([]byte, error) {
 	if d.IsZero() {
 		return []byte("null"), nil
@@ -35,7 +32,6 @@ func (d Date) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, d.Time.Format("2006-01-02"))), nil
 }
 
-// Value реализует интерфейс driver.Valuer для работы с БД.
 func (d Date) Value() (driver.Value, error) {
 	if d.IsZero() {
 		return nil, nil
@@ -43,8 +39,7 @@ func (d Date) Value() (driver.Value, error) {
 	return d.Time.Format("2006-01-02"), nil
 }
 
-// Scan реализует интерфейс sql.Scanner для чтения из БД.
-func (d *Date) Scan(value interface{}) error {
+func (d *Date) Scan(value any) error {
 	if value == nil {
 		d.Time = time.Time{}
 		return nil

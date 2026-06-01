@@ -13,7 +13,6 @@ import (
 )
 
 func Run(pool *pgxpool.Pool) {
-	// Инициализируем репозитории (возвращают интерфейсы)
 	rankRepo := postgres.NewRankRepo(pool)
 	specRepo := postgres.NewSpecializationRepo(pool)
 	districtRepo := postgres.NewDistrictRepo(pool)
@@ -48,7 +47,7 @@ func Run(pool *pgxpool.Pool) {
 		case "2":
 			handleSpecialization(ctx, reader, specRepo)
 		case "3":
-			handleDistrict(ctx, reader, districtRepo, specRepo)
+			handleDistrict(ctx, reader, districtRepo)
 		case "4":
 			handleCarModel(ctx, reader, carModelRepo)
 		case "5":
@@ -70,7 +69,6 @@ func Run(pool *pgxpool.Pool) {
 	}
 }
 
-// readLine читает строку из reader, удаляя пробелы по краям.
 func readLine(reader *bufio.Reader) string {
 	text, _ := reader.ReadString('\n')
 	return strings.TrimSpace(text)

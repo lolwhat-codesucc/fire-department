@@ -33,7 +33,7 @@ func TestCreateCarModel_Success(t *testing.T) {
 	repo.On("Create", mock.Anything, &input).Return(1, nil)
 
 	r := setupCarModelRouter(repo)
-	body, _ := json.Marshal(map[string]interface{}{
+	body, _ := json.Marshal(map[string]any{
 		"name":                   input.Name,
 		"maintenance_period_days": input.MaintenancePeriodDays,
 	})

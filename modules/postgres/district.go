@@ -80,8 +80,6 @@ func (r *DistrictRepo) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-// --- методы для специализаций района ---
-
 func (r *DistrictRepo) AddSpecialization(ctx context.Context, districtID, specID int) error {
 	query := `INSERT INTO District_specializations (district_id, specialization_id) VALUES ($1, $2)`
 	_, err := r.pool.Exec(ctx, query, districtID, specID)

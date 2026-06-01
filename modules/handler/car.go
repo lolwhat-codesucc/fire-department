@@ -25,7 +25,6 @@ func (h *CarHandler) Create(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "некорректный JSON: "+err.Error())
 		return
 	}
-	// Простейшая валидация
 	if input.ModelID == 0 {
 		respondError(w, http.StatusBadRequest, "model_id обязателен")
 		return

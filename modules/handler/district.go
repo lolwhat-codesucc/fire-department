@@ -93,8 +93,6 @@ func (h *DistrictHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// Дополнительные методы для специализаций района
-
 func (h *DistrictHandler) AddSpecialization(w http.ResponseWriter, r *http.Request) {
 	districtID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {

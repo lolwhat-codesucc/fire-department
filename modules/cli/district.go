@@ -11,8 +11,7 @@ import (
 )
 
 func handleDistrict(ctx context.Context, reader *bufio.Reader,
-	districtRepo repository.DistrictRepository,
-	specRepo repository.SpecializationRepository) {
+	districtRepo repository.DistrictRepository) {
 	for {
 		fmt.Println("\n--- Районы ---")
 		fmt.Println("1. Создать  2. Все  3. По ID  4. Обновить  5. Удалить")
@@ -68,7 +67,7 @@ func handleDistrict(ctx context.Context, reader *bufio.Reader,
 			fmt.Print("ID района: ")
 			distIDStr := readLine(reader)
 			distID, _ := strconv.Atoi(distIDStr)
-			handleDistrictSpecializations(ctx, reader, districtRepo, specRepo, distID)
+			handleDistrictSpecializations(ctx, reader, districtRepo, distID)
 		case "0":
 			return
 		default:
@@ -79,7 +78,6 @@ func handleDistrict(ctx context.Context, reader *bufio.Reader,
 
 func handleDistrictSpecializations(ctx context.Context, reader *bufio.Reader,
 	districtRepo repository.DistrictRepository,
-	specRepo repository.SpecializationRepository,
 	districtID int) {
 	for {
 		fmt.Println("\nСпециализации района")
