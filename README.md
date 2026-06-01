@@ -30,23 +30,9 @@
 
 ```mermaid
 erDiagram
-    Firefighter {
-        int id PK
-        string name
-        date year_of_birth
-        int rank_id FK "NOT NULL"
-        int qualification
-        int team_id FK "NULL"
-    }
     Rank {
         int id PK
         string name
-    }
-    Team {
-        int number PK
-        int specialization_id FK "NOT NULL"
-        int district_id FK "NOT NULL"
-        int car_id FK "NULL, UNIQUE"
     }
     Specialization {
         int id PK
@@ -56,9 +42,29 @@ erDiagram
         int id PK
         string name
     }
-    District_specializations {
-        int district_id PK, FK
-        int specialization_id PK, FK
+    Car_model {
+        int id PK
+        string name
+        int maintenance_period_days
+    }
+    Call_status {
+        int id PK
+        string name
+    }
+
+    Firefighter {
+        int id PK
+        string name
+        date year_of_birth
+        int rank_id FK "NOT NULL"
+        int qualification
+        int team_id FK "NULL"
+    }
+    Team {
+        int number PK
+        int specialization_id FK "NOT NULL"
+        int district_id FK "NOT NULL"
+        int car_id FK "NULL, UNIQUE"
     }
     Car {
         int id PK
@@ -66,11 +72,6 @@ erDiagram
         date acquisition_date
         date last_maintenance "NULL"
         bool ready "NOT NULL"
-    }
-    Car_model {
-        int id PK
-        string name
-        int maintenance_period_days
     }
     Call {
         int id PK
@@ -81,49 +82,42 @@ erDiagram
         int status_id FK "NOT NULL"
         string comment "NULL"
     }
-    Call_status {
-        int id PK
-        string name
+
+    District_specializations {
+        int district_id PK, FK
+        int specialization_id PK, FK
     }
+
     Rank ||--o{ Firefighter : ""
-    Team ||--o{ Firefighter : ""
     Specialization ||--o{ Team : ""
     District ||--o{ Team : ""
-    Car |o--o| Team : ""
-    Car_model ||--|{ Car : ""
+    District ||--o{ Call : ""
     District ||--o{ District_specializations : ""
     Specialization ||--o{ District_specializations : ""
+    Team ||--o{ Firefighter : ""
     Team ||--o{ Call : ""
-    District ||--o{ Call : ""
+    Team |o--o| Car : ""
+    Car_model ||--|{ Car : ""
     Car ||--o{ Call : ""
     Call_status ||--o{ Call : ""
 ```
 
-# Анализ нормализации (соответствие форме Бойса-Кодда)
+### Анализ нормализации (соответствие форме Бойса-Кодда)
 
 Схема базы данных удовлетворяет требованиям нормальной формы Бойса-Кодда (BCNF).
 
 Обоснование:
+- Все таблицы‑справочники (Rank, Specialization, District, Car_model, Call_status) содержат только один потенциальный ключ — первичный, и все неключевые атрибуты полностью от него зависят.
+- Все неключевые атрибуты Car зависят только от первичного ключа id.
+- В таблице Team поле car_id уникально, но оно может быть NULL, что не создаёт дополнительной функциональной зависимости.
+- Все связи многие‑ко‑многим (District_specializations) разложены на две связи 1:N, каждая из которых соответствует BCNF.
 
-    Все таблицы‑справочники (Rank, Specialization, District, Car_model, Call_status) содержат только один потенциальный ключ — первичный, и все неключевые атрибуты полностью от него зависят.
-
-    В таблице Car изначально присутствовала зависимость model_id → maintenance_period_days, что нарушало BCNF, так как model_id не является суперключом. Поле maintenance_period_days было перенесено в таблицу Car_model, где model_id — суперключ. Теперь все неключевые атрибуты Car зависят только от первичного ключа id.
-
-    В таблице Team поле car_id уникально, но оно может быть NULL, что не создаёт дополнительной функциональной зависимости, нарушающей BCNF.
-
-    Все связи многие‑ко‑многим (District_specializations) разложены на две связи 1:N, каждая из которых соответствует BCNF.
-
-Таким образом, в каждой таблице любой детерминант является суперключом,
-что гарантирует форму Бойса-Кодда. 
+Таким образом, в каждой таблице любой детерминант является суперключом, что гарантирует форму Бойса-Кодда. 
 
 # 3. Архитектура приложения
 
-Приложение построено на принципах чистой архитектуры со следующими слоями:
-
-    Слой обработчиков (handlers): Приём HTTP-запросов, валидация входных данных, формирование ответов. Используется роутер chi.
-
-    Слой репозиториев (repository): Интерфейсы для доступа к данным (CRUD и специфичные запросы). Реализации находятся в пакете postgres и используют pgxpool.
-
-    Слой моделей (domain/models): Структуры, отображающие таблицы БД, с тегами для JSON и БД.
-
-    Интерактивный CLI: Альтернативный способ взаимодействия с системой напрямую через терминал (пакет cli). Позволяет выполнять все CRUD-операции без HTTP-запросов.
+Приложение разделено на следующие слои:
+- Слой обработчиков (handlers): Приём HTTP-запросов, валидация входных данных, формирование ответов. Используется роутер chi.
+- Слой репозиториев (repository): Интерфейсы для доступа к данным (CRUD и специфичные запросы). Реализации находятся в пакете postgres и используют pgxpool.
+- Слой моделей (models): Структуры, отображающие таблицы БД, с тегами для JSON и БД.
+- Интерактивный CLI: Альтернативный способ взаимодействия с системой напрямую через терминал (пакет cli). Позволяет выполнять все CRUD-операции без HTTP-запросов.
