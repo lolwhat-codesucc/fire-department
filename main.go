@@ -23,7 +23,6 @@ import (
 )
 
 func main() {
-	// Подключение к БД
 	dsn := "postgres://doa@localhost:5432/fire_department?sslmode=disable"
 	runMigrations(dsn)
 
@@ -40,12 +39,10 @@ func main() {
 	defer pool.Close()
 
 	if len(os.Args) > 1 && os.Args[1] == "cli" {
-		// Запускаем интерактивный CLI
 		cli.Run(pool)
 		return
 	}
 
-	// Инициализация репозиториев
 	rankRepo := postgres.NewRankRepo(pool)
 	specRepo := postgres.NewSpecializationRepo(pool)
 	districtRepo := postgres.NewDistrictRepo(pool)
@@ -56,7 +53,6 @@ func main() {
 	ffRepo := postgres.NewFirefighterRepo(pool)
 	callRepo := postgres.NewCallRepo(pool)
 
-	// Инициализация обработчиков
 	rankHandler := handler.NewRankHandler(rankRepo)
 	specHandler := handler.NewSpecializationHandler(specRepo)
 	districtHandler := handler.NewDistrictHandler(districtRepo)
@@ -67,10 +63,8 @@ func main() {
 	ffHandler := handler.NewFirefighterHandler(ffRepo)
 	callHandler := handler.NewCallHandler(callRepo)
 
-	// Роутер
 	r := chi.NewRouter()
 
-	// Middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
@@ -79,9 +73,7 @@ func main() {
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
 	}))
 
-	// Маршруты API v1
 	r.Route("/api", func(r chi.Router) {
-		// Ranks
 		r.Route("/ranks", func(r chi.Router) {
 			r.Post("/", rankHandler.Create)
 			r.Get("/", rankHandler.GetAll)
@@ -90,7 +82,6 @@ func main() {
 			r.Delete("/{id}", rankHandler.Delete)
 		})
 
-		// Specializations
 		r.Route("/specializations", func(r chi.Router) {
 			r.Post("/", specHandler.Create)
 			r.Get("/", specHandler.GetAll)
@@ -99,7 +90,6 @@ func main() {
 			r.Delete("/{id}", specHandler.Delete)
 		})
 
-		// Districts + specializations subroutes
 		r.Route("/districts", func(r chi.Router) {
 			r.Post("/", districtHandler.Create)
 			r.Get("/", districtHandler.GetAll)
@@ -111,7 +101,6 @@ func main() {
 			r.Get("/{id}/specializations", districtHandler.GetSpecializations)
 		})
 
-		// Car models
 		r.Route("/car-models", func(r chi.Router) {
 			r.Post("/", carModelHandler.Create)
 			r.Get("/", carModelHandler.GetAll)
@@ -120,7 +109,6 @@ func main() {
 			r.Delete("/{id}", carModelHandler.Delete)
 		})
 
-		// Call statuses
 		r.Route("/call-statuses", func(r chi.Router) {
 			r.Post("/", callStatusHandler.Create)
 			r.Get("/", callStatusHandler.GetAll)
@@ -129,7 +117,6 @@ func main() {
 			r.Delete("/{id}", callStatusHandler.Delete)
 		})
 
-		// Cars
 		r.Route("/cars", func(r chi.Router) {
 			r.Post("/", carHandler.Create)
 			r.Get("/", carHandler.GetAll) // ?model=...
@@ -138,7 +125,6 @@ func main() {
 			r.Delete("/{id}", carHandler.Delete)
 		})
 
-		// Teams
 		r.Route("/teams", func(r chi.Router) {
 			r.Post("/", teamHandler.Create)
 			r.Get("/", teamHandler.GetAll) // ?district= &specialization=
@@ -147,7 +133,6 @@ func main() {
 			r.Delete("/{number}", teamHandler.Delete)
 		})
 
-		// Firefighters
 		r.Route("/firefighters", func(r chi.Router) {
 			r.Post("/", ffHandler.Create)
 			r.Get("/", ffHandler.GetAll) // ?team=
@@ -156,7 +141,6 @@ func main() {
 			r.Delete("/{id}", ffHandler.Delete)
 		})
 
-		// Calls
 		r.Route("/calls", func(r chi.Router) {
 			r.Post("/", callHandler.Create)
 			r.Get("/", callHandler.GetAll) // ?team= &car= &district= &status=
@@ -166,7 +150,6 @@ func main() {
 		})
 	})
 
-	// Запуск сервера
 	srv := &http.Server{
 		Addr:         ":8080",
 		Handler:      r,
@@ -174,7 +157,6 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	// Graceful shutdown
 	go func() {
 		sigCh := make(chan os.Signal, 1)
 		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
