@@ -97,8 +97,7 @@ erDiagram
     District ||--o{ Call : ""
     Car ||--o{ Call : ""
     Call_status ||--o{ Call : ""
-
-    ```
+```
 
 # Анализ нормализации (соответствие форме Бойса-Кодда)
 
