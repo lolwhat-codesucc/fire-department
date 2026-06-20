@@ -109,6 +109,85 @@ erDiagram
 
 В каждой таблице любой детерминант является суперключом, что гарантирует форму Бойса-Кодда. 
 
+### SQL схема базы
+```sql
+CREATE TABLE Rank (
+    id   INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Specialization (
+    id   INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE District (
+    id   INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Car_model (
+    id                     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name                   VARCHAR(100) NOT NULL,
+    maintenance_period_days INT NOT NULL
+);
+
+CREATE TABLE Call_status (
+    id   INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Car (
+    id                 INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    model_id           INT NOT NULL REFERENCES Car_model(id),
+    acquisition_date   DATE NOT NULL,
+    last_maintenance   DATE,                          
+    ready              BOOLEAN NOT NULL
+);
+
+CREATE TABLE Team (
+    number            INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    specialization_id INT NOT NULL REFERENCES Specialization(id),
+    district_id       INT NOT NULL REFERENCES District(id),
+    car_id            INT UNIQUE REFERENCES Car(id)  
+);
+
+CREATE TABLE Firefighter (
+    id             INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name           VARCHAR(200) NOT NULL,
+    year_of_birth  DATE NOT NULL,
+    rank_id        INT NOT NULL REFERENCES Rank(id),
+    qualification  INT NOT NULL,
+    team_id        INT REFERENCES Team(number)      
+);
+
+CREATE TABLE Call (
+    id          INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    team_id     INT NOT NULL REFERENCES Team(number),
+    district_id INT REFERENCES District(id),       
+    car_id      INT NOT NULL REFERENCES Car(id),
+    time        TIMESTAMP NOT NULL,
+    status_id   INT NOT NULL REFERENCES Call_status(id),
+    comment     TEXT                              
+);
+
+CREATE TABLE District_specializations (
+    district_id      INT NOT NULL REFERENCES District(id),
+    specialization_id INT NOT NULL REFERENCES Specialization(id),
+    PRIMARY KEY (district_id, specialization_id)
+);
+
+CREATE INDEX idx_firefighter_team ON Firefighter(team_id);
+CREATE INDEX idx_team_specialization ON Team(specialization_id);
+CREATE INDEX idx_team_district ON Team(district_id);
+CREATE INDEX idx_car_model ON Car(model_id);
+CREATE INDEX idx_call_team ON Call(team_id);
+CREATE INDEX idx_call_district ON Call(district_id);
+CREATE INDEX idx_call_car ON Call(car_id);
+CREATE INDEX idx_call_status ON Call(status_id);
+CREATE INDEX idx_district_spec_specialization ON District_specializations(specialization_id);
+```
+
 # 3. Архитектура приложения
 
 Приложение разделено на следующие слои:
@@ -168,6 +247,19 @@ erDiagram
 | GET    | /api/calls/{id}                                 | Получить вызов по ID                          |
 | PUT    | /api/calls/{id}                                 | Обновить вызов                                |
 | DELETE | /api/calls/{id}                                 | Удалить вызов                                 |
+
+### Пример go-структуры модели:
+```go
+type Call struct {
+	ID         int       `db:"id" json:"id"`
+	TeamID     int       `db:"team_id" json:"team_id"`
+	DistrictID *int      `db:"district_id" json:"district_id"` // nullable
+	CarID      int       `db:"car_id" json:"car_id"`
+	Time       time.Time `db:"time" json:"time"`
+	StatusID   int       `db:"status_id" json:"status_id"`
+	Comment    *string   `db:"comment" json:"comment"` // nullable
+}
+```
 
 ### Технологический стек:
 - Go 1.26.2
