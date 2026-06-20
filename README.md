@@ -117,7 +117,59 @@ erDiagram
 - Слой моделей (models): Структуры, отображающие таблицы БД, с тегами для JSON и БД.
 - Интерактивный CLI: Альтернативный способ взаимодействия с системой напрямую через терминал. Позволяет выполнять все CRUD-операции без HTTP-запросов.
 
-Технологический стек:
+### Таблица: эндпоинты REST API
+| Метод  | URL                                             | Описание                                      |
+|--------|-------------------------------------------------|-----------------------------------------------|
+| POST   | /api/ranks                                      | Создать звание                                |
+| GET    | /api/ranks                                      | Получить все звания                           |
+| GET    | /api/ranks/{id}                                 | Получить звание по ID                         |
+| PUT    | /api/ranks/{id}                                 | Обновить звание                               |
+| DELETE | /api/ranks/{id}                                 | Удалить звание                                |
+| POST   | /api/specializations                            | Создать специализацию                         |
+| GET    | /api/specializations                            | Получить все специализации                    |
+| GET    | /api/specializations/{id}                       | Получить специализацию по ID                  |
+| PUT    | /api/specializations/{id}                       | Обновить специализацию                        |
+| DELETE | /api/specializations/{id}                       | Удалить специализацию                         |
+| POST   | /api/districts                                  | Создать район                                 |
+| GET    | /api/districts                                  | Получить все районы                           |
+| GET    | /api/districts/{id}                             | Получить район по ID                          |
+| PUT    | /api/districts/{id}                             | Обновить район                                |
+| DELETE | /api/districts/{id}                             | Удалить район                                 |
+| POST   | /api/districts/{id}/specializations/{specId}    | Добавить специализацию району                 |
+| DELETE | /api/districts/{id}/specializations/{specId}    | Удалить специализацию у района                |
+| GET    | /api/districts/{id}/specializations             | Получить специализации района                 |
+| POST   | /api/car-models                                 | Создать модель автомобиля                     |
+| GET    | /api/car-models                                 | Получить все модели автомобилей               |
+| GET    | /api/car-models/{id}                            | Получить модель автомобиля по ID              |
+| PUT    | /api/car-models/{id}                            | Обновить модель автомобиля                    |
+| DELETE | /api/car-models/{id}                            | Удалить модель автомобиля                     |
+| POST   | /api/call-statuses                              | Создать статус вызова                         |
+| GET    | /api/call-statuses                              | Получить все статусы вызовов                  |
+| GET    | /api/call-statuses/{id}                         | Получить статус вызова по ID                  |
+| PUT    | /api/call-statuses/{id}                         | Обновить статус вызова                        |
+| DELETE | /api/call-statuses/{id}                         | Удалить статус вызова                         |
+| POST   | /api/cars                                       | Создать автомобиль                            |
+| GET    | /api/cars                                       | Получить все автомобили (фильтр ?model=id)    |
+| GET    | /api/cars/{id}                                  | Получить автомобиль по ID                     |
+| PUT    | /api/cars/{id}                                  | Обновить автомобиль                           |
+| DELETE | /api/cars/{id}                                  | Удалить автомобиль                            |
+| POST   | /api/teams                                      | Создать команду                               |
+| GET    | /api/teams                                      | Получить все команды (фильтры ?district=, ?specialization=) |
+| GET    | /api/teams/{number}                             | Получить команду по номеру                    |
+| PUT    | /api/teams/{number}                             | Обновить команду                              |
+| DELETE | /api/teams/{number}                             | Удалить команду                               |
+| POST   | /api/firefighters                               | Создать пожарного                             |
+| GET    | /api/firefighters                               | Получить всех пожарных (фильтр ?team=)        |
+| GET    | /api/firefighters/{id}                          | Получить пожарного по ID                      |
+| PUT    | /api/firefighters/{id}                          | Обновить пожарного                            |
+| DELETE | /api/firefighters/{id}                          | Удалить пожарного                             |
+| POST   | /api/calls                                      | Создать вызов                                 |
+| GET    | /api/calls                                      | Получить все вызовы (фильтры ?team=, ?car=, ?district=, ?status=) |
+| GET    | /api/calls/{id}                                 | Получить вызов по ID                          |
+| PUT    | /api/calls/{id}                                 | Обновить вызов                                |
+| DELETE | /api/calls/{id}                                 | Удалить вызов                                 |
+
+### Технологический стек:
 - Go 1.26.2
 - PostgreSQL 18
 - Драйвер pgx/v5
@@ -131,3 +183,16 @@ erDiagram
 - testify/mock: Создание мок-объектов, реализующих интерфейсы репозиториев.
 - httptest: Имитация HTTP-запросов и проверка ответов.
 - chi роутер: Тестирование маршрутов в изолированном окружении.
+
+Тестирование запускается из корня проекта:
+```
+go test -v ./tests/handler_test
+```
+# 5. Запуск
+
+Запуск производится в двух режимах: сервер (по умолчанию) и интерактивный cli:
+```
+go run .
+or
+go run . cli
+```
